@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/07 15:37:37 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/08 16:56:25 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,19 @@
 
 # include "libft.h"
 # include "mlx.h"
-
+# include "mlx_int.h"
 # include <fcntl.h>
 # include <math.h>
 # include <stdio.h>
 
 # define WIDTH 500
 # define HEIGHT 500
+# define SCALE 10
 
 typedef struct s_vector2
 {
-	double x;
-	double y;
+	int x;
+	int y;
 } t_vector2;
 
 typedef struct s_vector3

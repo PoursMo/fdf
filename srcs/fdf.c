@@ -18,8 +18,8 @@ t_vector2 isometric_project(t_vector3 target)
 	double rad;
 
 	rad = deg_to_rad(30);
-	projection.x = target.x * cos(rad) - target.y * cos(rad);
-	projection.y = target.x * sin(rad) + target.y * cos(rad) - target.z * sin(rad);
+	projection.x = ((target.x - target.y) * cos(rad) * SCALE) + WIDTH / 2;
+	projection.y = ((target.x + target.y) * sin(rad) * SCALE - target.z * SCALE) + HEIGHT / 2;
 	return (projection);
 }
 
@@ -64,7 +64,7 @@ void print_vector3(t_vector3 vector3)
 
 void print_vector2(t_vector2 vector2)
 {
-	printf("x: %f, y: %f\n", vector2.x, vector2.y);
+	printf("x: %d, y: %d\n", vector2.x, vector2.y);
 }
 
 t_vector3 new_point(int x, int y, int z)
@@ -79,24 +79,24 @@ t_vector3 new_point(int x, int y, int z)
 
 void bresenham_line(void* mlx, void* mlx_win, t_vector2 v1, t_vector2 v2)
 {
-	int dx = v2.x - v1.x;
-	int dy = v2.y - v1.y;
-	int sx = (v1.x 	< v2.x) ? 1 : -1;
-	int sy = (v1.y 	< v2.y) ? 1 : -1;
+	int dx = abs(v2.x - v1.x);
+	int dy = abs(v2.y - v1.y);
+	int sx = (v1.x < v2.x) ? 1 : -1;
+	int sy = (v1.y < v2.y) ? 1 : -1;
 	int err = dx - dy;
 
-	while(1)
+	while (1)
 	{
-		mlx_pixel_put(mlx, mlx_win, v1.x, v1.y, 0x00FF0000);
-		if(v1.x == v2.x && v1.y == v2.y)
-			break ;
-		int e2 = err * 2;
-		if(e2 > -dy)
+		mlx_pixel_put(mlx, mlx_win, v1.x, v1.y, 0x00FFFFFF);
+		if (v1.x == v2.x && v1.y == v2.y)
+			break;
+		int e2 = 2 * err;
+		if (e2 > -dy)
 		{
 			err -= dy;
 			v1.x += sx;
 		}
-		if(e2 < dx)
+		if (e2 < dx)
 		{
 			err += dx;
 			v1.y += sy;
@@ -139,15 +139,15 @@ t_vector3 *parse_map(char *map_file)
 	return (map);
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	void *mlx = mlx_init();
 	void *mlx_win = mlx_new_window(mlx, WIDTH, HEIGHT, "fdf");
 	// int color = get_color(255, 0, 0);
-	// (void)argc;
-	// t_vector3 *map = parse_map(argv[1]);
-	t_vector2 v1 = {.x = 100, .y = 100};
-	t_vector2 v2 = {.x = WIDTH - 100, .y = 100};
-	bresenham_line(mlx, mlx_win, v1, v2);
+	t_vector3 *map = parse_map(argv[argc - 1]);
+	for (size_t i = 1; i < 100; i++)
+	{
+		bresenham_line(mlx, mlx_win, isometric_project(map[i]), isometric_project(map[i - 1]));
+	}
 	mlx_loop(mlx);
 }
