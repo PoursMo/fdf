@@ -5,16 +5,18 @@ NAME = fdf
 SRCSDIR = srcs/
 SRCS = $(SRCSDIR)fdf.c
 OBJS = $(SRCS:.c=.o)
-LIBS =	libft/libft.a \
-		minilibx-linux/mlx_Linux.a
+LIBFT = libft/libft.a
+LIBMLX = minilibx-linux/mlx_Linux.a
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIBS)
+$(NAME): $(OBJS) $(LIBFT) $(LIBMLX)
 	$(CC) $(CFLAG) $< -o $@ $(LFLAG)
 
-$(LIBS):
+$(LIBFT):
 	make -C libft
+
+$(LIBMLX):
 	make -C minilibx-linux
 
 %.o: %.c
