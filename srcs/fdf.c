@@ -17,7 +17,7 @@ t_vector2 isometric_project(t_vector3 target)
 	t_vector2 projection;
 	double rad;
 
-	rad = deg_to_rad(30);
+	rad = deg_to_rad(45);
 	projection.x = ((target.x - target.y) * cos(rad) * SCALE) + WIDTH / 2;
 	projection.y = ((target.x + target.y) * sin(rad) * SCALE - target.z * SCALE) + HEIGHT / 2;
 	return (projection);
