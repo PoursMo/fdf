@@ -16,8 +16,8 @@ t_vector2 isometric_project(int x, int y, int z)
 	double rad;
 
 	rad = deg_to_rad(30);
-	projection.x = ((x - y) * cos(rad) * SCALE) + WIDTH / 2;
-	projection.y = ((x + y) * sin(rad) * SCALE - z * SCALE) + HEIGHT / 2;
+	projection.x = (x - y) * cos(rad) * SCALE;
+	projection.y = (x + y) * sin(rad) * SCALE - z * SCALE;
 	return (projection);
 }
 
@@ -72,27 +72,41 @@ void print_point(t_point **map, int y, int x)
 	printf("x: %d, y: %d, z: %d\n", x, y , map[y][x].z);
 }
 
-int main(int argc, char **argv)
+int main()
 {
 	void *mlx = mlx_init();
-	void *mlx_win = mlx_new_window(mlx, WIDTH, HEIGHT, "fdf");
-	t_point **map = parse_map(argv[argc - 1]);	
-	get_projection(map);
-		int x;
-	int y;
-	y = 0;
-	while(map[y])
+	void *win = mlx_new_window(mlx, WIDTH, HEIGHT, "fdf");
+	// t_point **map = parse_map(argv[argc - 1]);	
+	// get_projection(map);
+	// int x;
+	// int y;
+	void *img = mlx_new_image(mlx, 200, 200);
+	int bpp = 8;
+	int sl = WIDTH * bpp / 8;
+	int end = 0;
+	char *data = mlx_get_data_addr(img, &bpp, &sl, &end);
+	printf("%ld\n", sizeof(data));
+	int col = get_color(255, 255, 255);
+	for (size_t i = 0; i < 240; i++)
 	{
-		x = 0;
-		while(x < 4)
-		{
-			if(map[y + 1])
-				bresenham_line(mlx, mlx_win, map[y][x].projection, map[y + 1][x].projection);
-			if(x < 3)
-				bresenham_line(mlx, mlx_win, map[y][x].projection, map[y][x + 1].projection);
-			x++;
-		}
-		y++;
+		ft_memcpy(data, &col, bpp);
+		data += bpp / 8;
+		data += sl;
 	}
+	// y = 0;
+	// while(map[y])
+	// {
+	// 	x = 0;
+	// 	while(x < 4)
+	// 	{
+	// 		if(map[y + 1])
+	// 			bresenham_line(mlx, mlx_win, map[y][x].projection, map[y + 1][x].projection);
+	// 		if(x < 3)
+	// 			bresenham_line(mlx, mlx_win, map[y][x].projection, map[y][x + 1].projection);
+	// 		x++;
+	// 	}
+	// 	y++;
+	// }
+	mlx_put_image_to_window(mlx, win, img, 0, 0);
 	mlx_loop(mlx);
 }
