@@ -3,7 +3,9 @@ CFLAG = -Wall -Wextra -Werror -Ilibft -Iminilibx-linux
 LFLAG = -Llibft -lft -Lminilibx-linux -lmlx_Linux -lXext -lX11 -lm
 NAME = fdf
 SRCSDIR = srcs/
-SRCS = $(SRCSDIR)fdf.c
+SRCS =	$(SRCSDIR)fdf.c		\
+		$(SRCSDIR)parse.c	\
+		$(SRCSDIR)utils.c
 OBJS = $(SRCS:.c=.o)
 LIBFT = libft/libft.a
 LIBMLX = minilibx-linux/mlx_Linux.a
@@ -11,7 +13,7 @@ LIBMLX = minilibx-linux/mlx_Linux.a
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT) $(LIBMLX)
-	$(CC) $(CFLAG) $< -o $@ $(LFLAG)
+	$(CC) $(CFLAG) $(OBJS) -o $@ $(LFLAG)
 
 $(LIBFT):
 	make -C libft

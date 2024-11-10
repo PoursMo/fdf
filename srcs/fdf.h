@@ -22,7 +22,7 @@
 
 # define WIDTH 500
 # define HEIGHT 500
-# define SCALE 10
+# define SCALE 20
 
 typedef struct s_vector2
 {
@@ -30,11 +30,19 @@ typedef struct s_vector2
 	int y;
 } t_vector2;
 
-typedef struct s_vector3
+typedef struct s_point
 {
-	double x;
-	double y;
-	double z;
-} t_vector3;
+	int z;
+	t_vector2 projection;
+} t_point;
+
+//utils
+int try_open(char *file, int flag);
+void try_close(int fd);
+void free_split(char **split);
+
+//parse
+t_point **parse_map(char *map_file);
+
 
 #endif

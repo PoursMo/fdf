@@ -10,69 +10,34 @@ double deg_to_rad(double degrees)
 	return (degrees * (M_PI / 180));
 }
 
-t_vector2 isometric_project(t_vector3 target)
+t_vector2 isometric_project(int x, int y, int z)
 {
 	t_vector2 projection;
 	double rad;
 
-	rad = deg_to_rad(45);
-	projection.x = ((target.x - target.y) * cos(rad) * SCALE) + WIDTH / 2;
-	projection.y = ((target.x + target.y) * sin(rad) * SCALE - target.z * SCALE) + HEIGHT / 2;
+	rad = deg_to_rad(30);
+	projection.x = ((x - y) * cos(rad) * SCALE) + WIDTH / 2;
+	projection.y = ((x + y) * sin(rad) * SCALE - z * SCALE) + HEIGHT / 2;
 	return (projection);
 }
 
-int try_open(char *file, int flag)
+void get_projection(t_point **map)
 {
-	int fd;
-	fd = open(file, flag);
-	if (fd == -1)
+	int x;
+	int y;
+
+	y = 0;
+	while(map[y])
 	{
-		perror(file);
-		exit(EXIT_FAILURE);
+		x = 0;
+		while(x < 4)
+		{
+			map[y][x].projection = isometric_project(x, y, map[y][x].z);
+			printf("x: %d, y: %d\n", map[y][x].projection.x, map[y][x].projection.y);
+			x++;
+		}
+		y++;
 	}
-	return (fd);
-}
-
-void try_close(int fd)
-{
-	if(close(fd) == -1)
-	{
-		perror("close");
-		exit(EXIT_FAILURE);
-	}
-}
-
-void free_split(char **split)
-{
-	int i;
-
-	i = 0;
-	while(split[i])
-	{
-		free(split[i]);
-		i++;
-	}
-	free(split);
-}
-
-void print_vector3(t_vector3 vector3)
-{
-	printf("x: %f, y: %f, z: %f\n", vector3.x, vector3.y, vector3.z);
-}
-
-void print_vector2(t_vector2 vector2)
-{
-	printf("x: %d, y: %d\n", vector2.x, vector2.y);
-}
-
-t_vector3 new_point(int x, int y, int z)
-{
-	t_vector3 new;
-
-	new.x = x;
-	new.y = y;
-	new.z = z;
-	return (new);
 }
 
 void bresenham_line(void* mlx, void* mlx_win, t_vector2 v1, t_vector2 v2)
@@ -102,50 +67,32 @@ void bresenham_line(void* mlx, void* mlx_win, t_vector2 v1, t_vector2 v2)
 	}
 }
 
-t_vector3 *parse_map(char *map_file)
+void print_point(t_point **map, int y, int x)
 {
-	t_vector3 *map;
-	map = malloc(sizeof(t_vector3) * 100);
-	if(!map)
-	{
-		perror("parse_map");
-		exit(EXIT_FAILURE);
-	}
-	int fd = try_open(map_file, O_RDONLY);
-	int i = 0;
-	int y = 0;
-	char *line = get_next_line(fd);
-	while(line)
-	{
-		char **split = ft_split(line, ' ');
-		int x = 0;
-		while(split[x])
-		{
-			map[i].x = x;
-			map[i].y = y;
-			map[i].z = ft_atoi(split[x]);
-			i++;
-			x++;
-		}
-		free_split(split);
-		free(line);
-		line = get_next_line(fd);
-		y++;
-	}
-	free(line);
-	try_close(fd);
-	return (map);
+	printf("x: %d, y: %d, z: %d\n", x, y , map[y][x].z);
 }
 
 int main(int argc, char **argv)
 {
 	void *mlx = mlx_init();
 	void *mlx_win = mlx_new_window(mlx, WIDTH, HEIGHT, "fdf");
-	// int color = get_color(255, 0, 0);
-	t_vector3 *map = parse_map(argv[argc - 1]);
-	for (size_t i = 1; i < 100; i++)
+	t_point **map = parse_map(argv[argc - 1]);	
+	get_projection(map);
+		int x;
+	int y;
+	y = 0;
+	while(map[y])
 	{
-		bresenham_line(mlx, mlx_win, isometric_project(map[i]), isometric_project(map[i - 1]));
+		x = 0;
+		while(x < 4)
+		{
+			if(map[y + 1])
+				bresenham_line(mlx, mlx_win, map[y][x].projection, map[y + 1][x].projection);
+			if(x < 3)
+				bresenham_line(mlx, mlx_win, map[y][x].projection, map[y][x + 1].projection);
+			x++;
+		}
+		y++;
 	}
 	mlx_loop(mlx);
 }
