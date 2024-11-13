@@ -32,16 +32,15 @@ static int count_cols(char **split_line)
     return (count);
 }
 
-t_point **parse_map(char *map_file)
+int **parse_map(char *map_file, int *x_size)
 {
-	t_point **map;
+	int **map;
     char *line;
     char **split;
     int y;
     int x;
-    int x_size;
 
-	map = malloc(sizeof(t_point*) * count_lines(map_file) + 1);
+	map = malloc(sizeof(int*) * count_lines(map_file) + 1);
 	if(!map)
 	{
 		perror("parse_map");
@@ -59,20 +58,20 @@ t_point **parse_map(char *map_file)
             exit(EXIT_FAILURE);
         }
         if(y == 0)
-            x_size = count_cols(split);
-        map[y] = malloc(sizeof(t_point) * x_size);
+            *x_size = count_cols(split);
+        map[y] = malloc(sizeof(int) * *x_size);
         if(!map[y])
         {
             perror("parse_map");
             exit(EXIT_FAILURE);
         }
         x = 0;
-        while (x < x_size)
+        while (x < *x_size)
         {
             if (split[x][0] == '0' && split[x][1] == 'x')
-                map[y][x].z = ft_atoi_hex(split[x] + 2);
+                map[y][x] = ft_atoi_hex(split[x] + 2);
             else
-                map[y][x].z = ft_atoi(split[x]);
+                map[y][x] = ft_atoi(split[x]);
             x++;
         }
         y++;

@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/08 16:56:25 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/13 18:35:43 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 # include <fcntl.h>
 # include <math.h>
 # include <stdio.h>
+# include <limits.h>
 
 # define WIDTH 500
 # define HEIGHT 500
-# define SCALE 20
 
 typedef struct s_vector2
 {
@@ -30,11 +30,14 @@ typedef struct s_vector2
 	int y;
 } t_vector2;
 
-typedef struct s_point
+typedef struct s_img_data
 {
-	int z;
-	t_vector2 projection;
-} t_point;
+	void *img;
+	char *data;
+	int bits_per_pixel;
+	int size_line;
+	int endian;
+} t_img_data;
 
 //utils
 int try_open(char *file, int flag);
@@ -42,7 +45,7 @@ void try_close(int fd);
 void free_split(char **split);
 
 //parse
-t_point **parse_map(char *map_file);
+int **parse_map(char *map_file, int *x_size);
 
 
 #endif
