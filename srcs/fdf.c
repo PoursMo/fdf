@@ -5,6 +5,14 @@ int get_color(int red, int green, int blue)
 	return ((red << 16) | (green << 8) | blue);
 }
 
+int interpolate_color(int start_color, int end_color, double percentage)
+{
+	int red = ((start_color >> 16) & 0xFF) + (((end_color >> 16) & 0xFF) - ((start_color >> 16) & 0xFF)) * percentage;
+	int green = ((start_color >> 8) & 0xFF) + (((end_color >> 8) & 0xFF) - ((start_color >> 8) & 0xFF)) * percentage;
+	int blue = (start_color & 0xFF) + ((end_color & 0xFF) - (start_color & 0xFF)) * percentage;
+	return (get_color(red, green, blue));
+}
+
 float deg_to_rad(double degrees)
 {
 	return (degrees * (M_PI / 180.0f));
@@ -14,8 +22,8 @@ t_vector2 isometric_project(int x, int y, int z, float zoom)
 {
 	t_vector2 projection;
 
-	projection.x = ((x - y) * cos(deg_to_rad(30)) * zoom) + WIDTH / 2;
-	projection.y = ((x + y) * sin(deg_to_rad(30)) * zoom) - (z * zoom) + HEIGHT / 2;
+	projection.x = ((x - y) * cos(deg_to_rad(35)) * zoom) + WIDTH / 2;
+	projection.y = ((x + y) * sin(deg_to_rad(35)) * zoom) - (z) + HEIGHT / 2;
 	return (projection);
 }
 
@@ -109,21 +117,20 @@ int main(int argc, char **argv)
 	mlx_win = mlx_new_window(mlx_ptr, WIDTH, HEIGHT, "fdf");
 	create_img(mlx_ptr, &img_data);
 	int **heightmap = parse_map(argv[argc - 1], &x_size);
-
+	int zoom = 20;
 	for (int y = 0; heightmap[y]; y++)
 	{
 		for (int x = 0; x < x_size; x++)
 		{
-			t_vector2 projection = isometric_project(x, y, heightmap[y][x], 5);
-			place_pixel_in_img(img_data.data, projection.x, projection.y, get_color(255, 255, 255));
+			t_vector2 projection = isometric_project(x, y, heightmap[y][x], zoom);
 			if (x < x_size - 1)
 			{
-				t_vector2 next_projection = isometric_project(x + 1, y, heightmap[y][x + 1], 5);
+				t_vector2 next_projection = isometric_project(x + 1, y, heightmap[y][x + 1], zoom);
 				bresenheim_line(projection, next_projection, img_data.data, get_color(255, 255, 255));
 			}
 			if (heightmap[y + 1])
 			{
-				t_vector2 next_projection = isometric_project(x, y + 1, heightmap[y + 1][x], 5);
+				t_vector2 next_projection = isometric_project(x, y + 1, heightmap[y + 1][x], zoom);
 				bresenheim_line(projection, next_projection, img_data.data, get_color(255, 255, 255));
 			}
 		}
