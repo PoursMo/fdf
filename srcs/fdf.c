@@ -72,6 +72,27 @@ void create_img(void *mlx, t_img_data *data)
 	clear_img(data->data);
 }
 
+int terminate()
+{
+	exit(0);
+}
+
+int handle_key(int keycode)
+{
+	printf("keycode: %d\n", keycode);
+	if(keycode == 65307)
+		terminate();
+	return (0);
+}
+
+int handle_mouse(int button, int x, int y)
+{
+	printf("button: %d\n", button);
+	printf("x: %d\n", x);
+	printf("y: %d\n", y);
+	return (0);
+}
+
 int main(int argc, char **argv)
 {
 	void *mlx_ptr;
@@ -79,6 +100,11 @@ int main(int argc, char **argv)
 	t_img_data img_data;
 	int x_size;
 	
+	if(argc != 2)
+	{
+		printf("Usage: %s <filename>\n", argv[0]);
+		return (1);
+	}
 	mlx_ptr = mlx_init();
 	mlx_win = mlx_new_window(mlx_ptr, WIDTH, HEIGHT, "fdf");
 	create_img(mlx_ptr, &img_data);
@@ -103,5 +129,8 @@ int main(int argc, char **argv)
 		}
 	}
 	mlx_put_image_to_window(mlx_ptr, mlx_win, img_data.img, 0, 0);
+	mlx_hook(mlx_win, DestroyNotify, 0, terminate, NULL);
+	mlx_key_hook(mlx_win, handle_key, NULL);
+	mlx_mouse_hook(mlx_win, handle_mouse, NULL);
 	mlx_loop(mlx_ptr);
 }
