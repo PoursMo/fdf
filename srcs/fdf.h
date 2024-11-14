@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/13 18:35:43 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/14 15:04:15 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 # include <stdio.h>
 # include <limits.h>
 
-# define WIDTH 500
-# define HEIGHT 500
+# define WIDTH 800
+# define HEIGHT 600
 
 typedef struct s_vector2
 {
@@ -46,6 +46,5 @@ void free_split(char **split);
 
 //parse
 int **parse_map(char *map_file, int *x_size);
-
 
 #endif
