@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/15 17:19:50 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/15 21:13:49 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,12 @@ typedef struct s_vector2
 	int y;
 } t_vector2;
 
+typedef struct s_point
+{
+	int z;
+	int color;
+} t_point;
+
 typedef struct s_img_data
 {
 	void *img;
@@ -41,7 +47,7 @@ typedef struct s_img_data
 
 typedef struct s_data
 {
-	int **heightmap;
+	t_point **heightmap;
 	t_img_data img_data;
 	void *mlx_ptr;
 	void *mlx_win;
@@ -64,6 +70,6 @@ void try_close(int fd);
 void free_split(char **split);
 
 //parse
-int **parse_map(char *map_file, int *x_size);
+void parse_map(char *map_file, t_data *data);
 
 #endif

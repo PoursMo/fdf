@@ -26,8 +26,8 @@ t_vector2 isometric_project(int x, int y, t_data data)
     double rad_z = deg_to_rad(data.angle_z);
 
     // Apply rotation around the x-axis
-    double rotated_y = y * cos(rad_x) - data.heightmap[y][x] * sin(rad_x);
-    double rotated_z = y * sin(rad_x) + data.heightmap[y][x] * cos(rad_x);
+    double rotated_y = y * cos(rad_x) - data.heightmap[y][x].z * sin(rad_x);
+    double rotated_z = y * sin(rad_x) + data.heightmap[y][x].z * cos(rad_x);
 
     // Apply rotation around the y-axis
     double rotated_x = x * cos(rad_y) + rotated_z * sin(rad_y);
@@ -134,44 +134,6 @@ int terminate()
 	exit(0);
 }
 
-int get_min_z(int **heightmap, int x_size)
-{
-	int min = INT_MAX;
-	for (int y = 0; heightmap[y]; y++)
-	{
-		for (int x = 0; x < x_size; x++)
-		{
-			if (heightmap[y][x] < min)
-				min = heightmap[y][x];
-		}
-	}
-	return (min);
-}
-
-int get_max_z(int **heightmap, int x_size)
-{
-	int max = INT_MIN;
-	for (int y = 0; heightmap[y]; y++)
-	{
-		for (int x = 0; x < x_size; x++)
-		{
-			if (heightmap[y][x] > max)
-				max = heightmap[y][x];
-		}
-	}
-	return (max);
-}
-
-int color_with_z(int z, int min_z, int max_z)
-{
-	if(z < 0)
-
-		return interpolate_color(0xFFFFFF, 0x0000FF, (double)z / min_z);
-	if(z > 0)
-		return interpolate_color(0xFFFFFF, 0xFF0000, (double)z / max_z);
-	return (0xFFFFFF);
-}
-
 t_vector2 translate(t_vector2 point, int tx, int ty)
 {
     t_vector2 translated;
@@ -206,8 +168,6 @@ void draw(t_data data)
 	int offsety = HEIGHT / 2 - center_y;
 
 	clear_img(data.img_data.data);
-	int min_z = get_min_z(data.heightmap, data.x_size);
-	int max_z = get_max_z(data.heightmap, data.x_size);
 	for (int y = 0; data.heightmap[y]; y++)
 	{
 		for (int x = 0; x < data.x_size; x++)
@@ -218,13 +178,13 @@ void draw(t_data data)
 			{
 				t_vector2 next_projection = isometric_project(x + 1, y, data);
 				next_projection = translate(next_projection, data.tx + offsetx, data.ty + offsety);
-				bresenheim_line(projection, next_projection, data.img_data, color_with_z(data.heightmap[y][x], min_z, max_z), color_with_z(data.heightmap[y][x + 1], min_z, max_z));
+				bresenheim_line(projection, next_projection, data.img_data, data.heightmap[y][x].color, data.heightmap[y][x + 1].color);
 			}
 			if (data.heightmap[y + 1])
 			{
 				t_vector2 next_projection = isometric_project(x, y + 1, data);
 				next_projection = translate(next_projection, data.tx + offsetx, data.ty + offsety);
-				bresenheim_line(projection, next_projection, data.img_data, color_with_z(data.heightmap[y][x], min_z, max_z), color_with_z(data.heightmap[y + 1][x], min_z, max_z));
+				bresenheim_line(projection, next_projection, data.img_data, data.heightmap[y][x].color, data.heightmap[y + 1][x].color);
 			}
 		}
 	}
@@ -311,7 +271,6 @@ int main(int argc, char **argv)
 	void *mlx_ptr;
 	void *mlx_win;
 	t_img_data img_data;
-	int x_size;
 	
 	if(argc != 2)
 	{
@@ -323,11 +282,14 @@ int main(int argc, char **argv)
 	mlx_ptr = mlx_init();
 	mlx_win = mlx_new_window(mlx_ptr, WIDTH, HEIGHT, "fdf");
 	create_img(mlx_ptr, &img_data);
-	int **heightmap = parse_map(argv[argc - 1], &x_size);
-	t_data data = {.heightmap = heightmap, .img_data = img_data, .mlx_ptr = mlx_ptr, .mlx_win = mlx_win, .x_size = x_size, .zoom = 1.0f, .angle_x = 0.0f, .angle_y = 0.0f, .angle_z = 0.0f, .tx = 0, .ty = 0};
+	t_data data = {.img_data = img_data, .mlx_ptr = mlx_ptr, .mlx_win = mlx_win, .zoom = 1.0f, .angle_x = 0.0f, .angle_y = 0.0f, .angle_z = 0.0f, .tx = 0, .ty = 0};
+	parse_map(argv[argc - 1], &data);
+
+	//find initial zoom
 	int min_x, max_x, min_y, max_y;
     calculate_bounding_box(data, &min_x, &max_x, &min_y, &max_y);
     data.zoom = calculate_initial_zoom(min_x, max_x, min_y, max_y);
+
 	draw(data);
 	mlx_hook(mlx_win, DestroyNotify, 0, terminate, NULL);
 	mlx_key_hook(mlx_win, handle_key, &data);

@@ -32,15 +32,15 @@ static int count_cols(char **split_line)
     return (count);
 }
 
-int **parse_map(char *map_file, int *x_size)
+void parse_map(char *map_file, t_data *data)
 {
-	int **map;
+	t_point **map;
     char *line;
     char **split;
     int y;
     int x;
 
-	map = malloc(sizeof(int*) * count_lines(map_file) + 1);
+	map = malloc(sizeof(t_point*) * (count_lines(map_file) + 1));
 	if(!map)
 	{
 		perror("parse_map");
@@ -49,8 +49,8 @@ int **parse_map(char *map_file, int *x_size)
 	int fd = try_open(map_file, O_RDONLY);
 	line = get_next_line(fd);
     y = 0;
-	while(line)
-	{
+    while (line)
+    {
 		split = ft_split(line, ' ');
         if(!split)
         {
@@ -58,17 +58,22 @@ int **parse_map(char *map_file, int *x_size)
             exit(EXIT_FAILURE);
         }
         if(y == 0)
-            *x_size = count_cols(split);
-        map[y] = malloc(sizeof(int) * *x_size);
+            data->x_size = count_cols(split);
+        map[y] = malloc(sizeof(t_point) * data->x_size);
         if(!map[y])
         {
             perror("parse_map");
             exit(EXIT_FAILURE);
         }
         x = 0;
-        while (x < *x_size)
+        while (x < data->x_size)
         {
-            map[y][x] = ft_atoi(split[x]);
+            map[y][x].z = ft_atoi(split[x]);
+            char *color = ft_strchr(split[x], ',');
+            if(color)
+                map[y][x].color = ft_atoi_hex(color + 1);
+            else
+                map[y][x].color = 0xFFFFFF;
             x++;
         }
         y++;
@@ -78,5 +83,5 @@ int **parse_map(char *map_file, int *x_size)
 	}
     map[y] = NULL;
 	try_close(fd);
-	return (map);
+	data->heightmap = map;
 }
