@@ -68,10 +68,7 @@ int **parse_map(char *map_file, int *x_size)
         x = 0;
         while (x < *x_size)
         {
-            if (split[x][0] == '0' && split[x][1] == 'x')
-                map[y][x] = ft_atoi_hex(split[x] + 2);
-            else
-                map[y][x] = ft_atoi(split[x]);
+            map[y][x] = ft_atoi(split[x]);
             x++;
         }
         y++;
