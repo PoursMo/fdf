@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/15 21:13:49 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/15 23:44:16 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ typedef struct s_data
 	double angle_x;
 	double angle_y;
 	double angle_z;
+	t_vector2 (*project)(int x, int y, struct s_data data);
 } t_data;
 
 //image

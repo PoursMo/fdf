@@ -43,6 +43,31 @@ t_vector2 isometric_project(int x, int y, t_data data)
     return projection;
 }
 
+t_vector2 perspective_project(int x, int y, t_data data)
+{
+    t_vector2 projection;
+    double rad_x = deg_to_rad(data.angle_x);
+    double rad_y = deg_to_rad(data.angle_y);
+    double rad_z = deg_to_rad(data.angle_z);
+
+    // Apply rotation around the x-axis
+    double rotated_y = y * cos(rad_x) - data.heightmap[y][x].z * sin(rad_x);
+    double rotated_z = y * sin(rad_x) + data.heightmap[y][x].z * cos(rad_x);
+
+    // Apply rotation around the y-axis
+    double rotated_x = x * cos(rad_y) + rotated_z * sin(rad_y);
+    rotated_z = -x * sin(rad_y) + rotated_z * cos(rad_y);
+
+    // Apply rotation around the z-axis
+    double final_x = rotated_x * cos(rad_z) - rotated_y * sin(rad_z);
+    double final_y = rotated_x * sin(rad_z) + rotated_y * cos(rad_z);
+
+    // Apply parallel projection
+    projection.x = final_x * data.zoom;
+    projection.y = final_y * data.zoom;
+    return projection;
+}
+
 void calculate_bounding_box(t_data data, int *min_x, int *max_x, int *min_y, int *max_y)
 {
     *min_x = INT_MAX;
@@ -54,7 +79,7 @@ void calculate_bounding_box(t_data data, int *min_x, int *max_x, int *min_y, int
     {
         for (int x = 0; x < data.x_size; x++)
         {
-            t_vector2 projection = isometric_project(x, y, data);
+            t_vector2 projection = data.project(x, y, data);
             if (projection.x < *min_x) *min_x = projection.x;
             if (projection.x > *max_x) *max_x = projection.x;
             if (projection.y < *min_y) *min_y = projection.y;
@@ -172,17 +197,17 @@ void draw(t_data data)
 	{
 		for (int x = 0; x < data.x_size; x++)
 		{
-			t_vector2 projection = isometric_project(x, y, data);
+			t_vector2 projection = data.project(x, y, data);
 			projection = translate(projection, data.tx + offsetx, data.ty + offsety);
 			if (x < data.x_size - 1)
 			{
-				t_vector2 next_projection = isometric_project(x + 1, y, data);
+				t_vector2 next_projection = data.project(x + 1, y, data);
 				next_projection = translate(next_projection, data.tx + offsetx, data.ty + offsety);
 				bresenheim_line(projection, next_projection, data.img_data, data.heightmap[y][x].color, data.heightmap[y][x + 1].color);
 			}
 			if (data.heightmap[y + 1])
 			{
-				t_vector2 next_projection = isometric_project(x, y + 1, data);
+				t_vector2 next_projection = data.project(x, y + 1, data);
 				next_projection = translate(next_projection, data.tx + offsetx, data.ty + offsety);
 				bresenheim_line(projection, next_projection, data.img_data, data.heightmap[y][x].color, data.heightmap[y + 1][x].color);
 			}
@@ -256,6 +281,11 @@ int handle_key(int keycode, t_data *data)
 		data->angle_x += 5.0f;
 		draw(*data);
 	}
+	else if(keycode == 112)
+	{
+		data->project = (data->project == perspective_project) ? isometric_project : perspective_project;
+		draw(*data);
+	}
 	return (0);
 }
 
@@ -282,7 +312,7 @@ int main(int argc, char **argv)
 	mlx_ptr = mlx_init();
 	mlx_win = mlx_new_window(mlx_ptr, WIDTH, HEIGHT, "fdf");
 	create_img(mlx_ptr, &img_data);
-	t_data data = {.img_data = img_data, .mlx_ptr = mlx_ptr, .mlx_win = mlx_win, .zoom = 1.0f, .angle_x = 0.0f, .angle_y = 0.0f, .angle_z = 0.0f, .tx = 0, .ty = 0};
+	t_data data = {.img_data = img_data, .mlx_ptr = mlx_ptr, .mlx_win = mlx_win, .zoom = 1.0f, .angle_x = 0.0f, .angle_y = 0.0f, .angle_z = 0.0f, .tx = 0, .ty = 0, .project = perspective_project};
 	parse_map(argv[argc - 1], &data);
 
 	//find initial zoom
