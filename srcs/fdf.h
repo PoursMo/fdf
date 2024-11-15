@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/14 15:04:15 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/15 17:19:50 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,25 @@ typedef struct s_img_data
 	int size_line;
 	int endian;
 } t_img_data;
+
+typedef struct s_data
+{
+	int **heightmap;
+	t_img_data img_data;
+	void *mlx_ptr;
+	void *mlx_win;
+	int x_size;
+	int tx;
+	int ty;
+	double zoom;
+	double angle_x;
+	double angle_y;
+	double angle_z;
+} t_data;
+
+//image
+void create_img(void *mlx, t_img_data *data);
+void clear_img(char *data);
 
 //utils
 int try_open(char *file, int flag);

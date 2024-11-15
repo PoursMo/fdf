@@ -5,7 +5,8 @@ NAME = fdf
 SRCSDIR = srcs/
 SRCS =	$(SRCSDIR)fdf.c		\
 		$(SRCSDIR)parse.c	\
-		$(SRCSDIR)utils.c
+		$(SRCSDIR)utils.c	\
+		$(SRCSDIR)image.c
 OBJS = $(SRCS:.c=.o)
 LIBFT = libft/libft.a
 
