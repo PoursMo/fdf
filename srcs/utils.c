@@ -33,3 +33,8 @@ void free_split(char **split)
 	}
 	free(split);
 }
+
+int terminate()
+{
+	exit(0);
+}

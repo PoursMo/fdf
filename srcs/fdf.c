@@ -1,73 +1,5 @@
 #include "fdf.h"
 
-int get_color(int red, int green, int blue)
-{
-	return ((red << 16) | (green << 8) | blue);
-}
-
-int interpolate_color(int start_color, int end_color, double percentage)
-{
-	int red = ((start_color >> 16) & 0xFF) + (((end_color >> 16) & 0xFF) - ((start_color >> 16) & 0xFF)) * percentage;
-	int green = ((start_color >> 8) & 0xFF) + (((end_color >> 8) & 0xFF) - ((start_color >> 8) & 0xFF)) * percentage;
-	int blue = (start_color & 0xFF) + ((end_color & 0xFF) - (start_color & 0xFF)) * percentage;
-	return (get_color(red, green, blue));
-}
-
-double deg_to_rad(double degrees)
-{
-	return (degrees * (M_PI / 180.0f));
-}
-
-t_vector2 isometric_project(int x, int y, t_data data)
-{
-    t_vector2 projection;
-    double rad_x = deg_to_rad(data.angle_x);
-    double rad_y = deg_to_rad(data.angle_y);
-    double rad_z = deg_to_rad(data.angle_z);
-
-    // Apply rotation around the x-axis
-    double rotated_y = y * cos(rad_x) - data.heightmap[y][x].z * sin(rad_x);
-    double rotated_z = y * sin(rad_x) + data.heightmap[y][x].z * cos(rad_x);
-
-    // Apply rotation around the y-axis
-    double rotated_x = x * cos(rad_y) + rotated_z * sin(rad_y);
-    rotated_z = -x * sin(rad_y) + rotated_z * cos(rad_y);
-
-    // Apply rotation around the z-axis
-    double final_x = rotated_x * cos(rad_z) - rotated_y * sin(rad_z);
-    double final_y = rotated_x * sin(rad_z) + rotated_y * cos(rad_z);
-
-    // Apply isometric projection
-    projection.x = ((final_x - final_y) * cos(deg_to_rad(30)) * data.zoom);
-    projection.y = ((final_x + final_y) * sin(deg_to_rad(30)) * data.zoom) - (rotated_z * data.zoom);
-    return projection;
-}
-
-t_vector2 perspective_project(int x, int y, t_data data)
-{
-    t_vector2 projection;
-    double rad_x = deg_to_rad(data.angle_x);
-    double rad_y = deg_to_rad(data.angle_y);
-    double rad_z = deg_to_rad(data.angle_z);
-
-    // Apply rotation around the x-axis
-    double rotated_y = y * cos(rad_x) - data.heightmap[y][x].z * sin(rad_x);
-    double rotated_z = y * sin(rad_x) + data.heightmap[y][x].z * cos(rad_x);
-
-    // Apply rotation around the y-axis
-    double rotated_x = x * cos(rad_y) + rotated_z * sin(rad_y);
-    rotated_z = -x * sin(rad_y) + rotated_z * cos(rad_y);
-
-    // Apply rotation around the z-axis
-    double final_x = rotated_x * cos(rad_z) - rotated_y * sin(rad_z);
-    double final_y = rotated_x * sin(rad_z) + rotated_y * cos(rad_z);
-
-    // Apply parallel projection
-    projection.x = final_x * data.zoom;
-    projection.y = final_y * data.zoom;
-    return projection;
-}
-
 void calculate_bounding_box(t_data data, int *min_x, int *max_x, int *min_y, int *max_y)
 {
     *min_x = INT_MAX;
@@ -92,6 +24,13 @@ void calculate_center(int min_x, int max_x, int min_y, int max_y, int *center_x,
 {
     *center_x = (min_x + max_x) / 2;
     *center_y = (min_y + max_y) / 2;
+}
+
+int calculate_initial_zoom(int min_x, int max_x, int min_y, int max_y)
+{
+    int zoom_x = WIDTH / (max_x - min_x);
+    int zoom_y = HEIGHT / (max_y - min_y);
+    return fmin(zoom_x, zoom_y);
 }
 
 void place_pixel_in_img(char *data, int x, int y, int color, int endian)
@@ -152,13 +91,6 @@ void bresenheim_line(t_vector2 start, t_vector2 end, t_img_data img_data, int st
 	}
 }
 
-
-
-int terminate()
-{
-	exit(0);
-}
-
 t_vector2 translate(t_vector2 point, int tx, int ty)
 {
     t_vector2 translated;
@@ -167,21 +99,6 @@ t_vector2 translate(t_vector2 point, int tx, int ty)
     return (translated);
 }
 
-void print_tooltips(t_data data)
-{
-	static char *tooltips[] = {"+/- : zoom", "w/a/s/d : move", "y/u : rotate x", "h/j : rotate y", "n/m : rotate z", NULL};
-	int y;
-	int i;
-
-	y = 15;
-	i = 0;
-	while(tooltips[i])
-	{
-		mlx_string_put(data.mlx_ptr, data.mlx_win, 10, y, get_color(100, 255, 100), tooltips[i]);
-		y += 15;
-		i++;
-	}
-}
 
 void draw(t_data data)
 {
@@ -215,85 +132,6 @@ void draw(t_data data)
 	}
 	mlx_put_image_to_window(data.mlx_ptr, data.mlx_win, data.img_data.img, 0, 0);
 	print_tooltips(data);
-}
-
-int handle_key(int keycode, t_data *data)
-{
-	if(keycode == 65307)
-		terminate();
-	else if(keycode == 61 && data->zoom < 100.0f)
-	{
-		data->zoom += 1.0f;
-		draw(*data);
-	}
-	else if(keycode == 45 && data->zoom > 1.0f)
-	{
-		data->zoom -= 1.0f;
-		draw(*data);
-	}
-	else if(keycode == 119)
-	{
-		data->ty -= 20;
-		draw(*data);
-	}
-	else if(keycode == 97)
-	{
-		data->tx -= 20;
-		draw(*data);
-	}
-	else if(keycode == 115)
-	{
-		data->ty += 20;
-		draw(*data);
-	}
-	else if(keycode == 100)
-	{
-		data->tx += 20;
-		draw(*data);
-	}
-	else if(keycode == 110)
-	{
-		data->angle_z -= 5.0f;
-		draw(*data);
-	}
-	else if(keycode == 109)
-	{
-		data->angle_z += 5.0f;
-		draw(*data);
-	}
-	else if(keycode == 104)
-	{
-		data->angle_y -= 5.0f;
-		draw(*data);
-	}
-	else if(keycode == 106)
-	{
-		data->angle_y += 5.0f;
-		draw(*data);
-	}
-	else if(keycode == 121)
-	{
-		data->angle_x -= 5.0f;
-		draw(*data);
-	}
-	else if(keycode == 117)
-	{
-		data->angle_x += 5.0f;
-		draw(*data);
-	}
-	else if(keycode == 112)
-	{
-		data->project = (data->project == perspective_project) ? isometric_project : perspective_project;
-		draw(*data);
-	}
-	return (0);
-}
-
-double calculate_initial_zoom(int min_x, int max_x, int min_y, int max_y)
-{
-    double zoom_x = (double)WIDTH / (max_x - min_x);
-    double zoom_y = (double)HEIGHT / (max_y - min_y);
-    return fmin(zoom_x, zoom_y);
 }
 
 int main(int argc, char **argv)

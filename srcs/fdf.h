@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/15 23:44:16 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/16 14:39:40 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,27 @@ typedef struct s_data
 	int x_size;
 	int tx;
 	int ty;
-	double zoom;
+	int zoom;
 	double angle_x;
 	double angle_y;
 	double angle_z;
 	t_vector2 (*project)(int x, int y, struct s_data data);
 } t_data;
+
+//fdf
+void draw(t_data data);
+
+//input
+int handle_key(int keycode, t_data *data);
+void print_tooltips(t_data data);
+
+//color
+int get_color(int red, int green, int blue);
+int interpolate_color(int start_color, int end_color, double ratio);
+
+//projection
+t_vector2 isometric_project(int x, int y, t_data data);
+t_vector2 perspective_project(int x, int y, t_data data);
 
 //image
 void create_img(void *mlx, t_img_data *data);
@@ -69,6 +84,7 @@ void clear_img(char *data);
 int try_open(char *file, int flag);
 void try_close(int fd);
 void free_split(char **split);
+int terminate();
 
 //parse
 void parse_map(char *map_file, t_data *data);
