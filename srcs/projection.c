@@ -49,7 +49,7 @@ t_vector2 perspective_project(int x, int y, t_data data)
     double final_x = rotated_x * cos(rad_z) - rotated_y * sin(rad_z);
     double final_y = rotated_x * sin(rad_z) + rotated_y * cos(rad_z);
 
-    // Apply parallel projection
+    // Apply orthographic projection
     projection.x = final_x * data.zoom;
     projection.y = final_y * data.zoom;
     return projection;

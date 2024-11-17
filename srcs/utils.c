@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 15:08:20 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/17 17:45:06 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/17 18:57:31 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,22 @@ void	try_close(int fd)
 	}
 }
 
-void free_map(t_point **map)
+int	try_open(char *file, int flags)
 {
-	int i;
+	int	fd;
+
+	fd = open(file, flags);
+	if (fd == -1)
+	{
+		perror("try_open : file open");
+		exit(EXIT_FAILURE);
+	}
+	return (fd);
+}
+
+void	free_map(t_point **map)
+{
+	int	i;
 
 	i = 0;
 	while (map[i])
@@ -51,13 +64,4 @@ int	terminate(t_data data)
 {
 	free_map(data.heightmap);
 	exit(0);
-}
-
-t_vector2	translate(t_vector2 point, int tx, int ty)
-{
-	t_vector2	translated;
-
-	translated.x = point.x + tx;
-	translated.y = point.y + ty;
-	return (translated);
 }

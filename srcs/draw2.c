@@ -5,88 +5,104 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/17 15:06:09 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/17 16:55:57 by aloubry          ###   ########.fr       */
+/*   Created: 2024/11/17 19:59:59 by aloubry           #+#    #+#             */
+/*   Updated: 2024/11/17 20:00:45 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void	place_pixel_in_img(t_img_data img_data, int x, int y, int color)
+static t_vector2	translate(t_vector2 point, int tx, int ty)
 {
-	int	i;
-	int	bytes_per_pixel;
+	t_vector2	translated;
 
-	if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT)
-		return ;
-	bytes_per_pixel = img_data.bits_per_pixel / 8;
-	i = (x * bytes_per_pixel) + (y * WIDTH * bytes_per_pixel);
-	if (img_data.endian == 0)
-	{
-		img_data.data[i] = color & 0xFF;
-		img_data.data[i + 1] = (color >> 8) & 0xFF;
-		img_data.data[i + 2] = (color >> 16) & 0xFF;
-		img_data.data[i + 3] = (color >> 24) & 0xFF;
-	}
-	else
-	{
-		img_data.data[i] = (color >> 24) & 0xFF;
-		img_data.data[i + 1] = (color >> 16) & 0xFF;
-		img_data.data[i + 2] = (color >> 8) & 0xFF;
-		img_data.data[i + 3] = color & 0xFF;
-	}
+	translated.x = point.x + tx;
+	translated.y = point.y + ty;
+	return (translated);
 }
 
-void	init_line_data(t_line_data *line)
+static t_vector2	calc_center_offset(t_vector2 **projections, t_data data)
 {
-	line->dx = abs(line->end.x - line->start.x);
-	line->dy = abs(line->end.y - line->start.y);
-	if (line->start.x < line->end.x)
-		line->sx = 1;
-	else
-		line->sx = -1;
-	if (line->start.y < line->end.y)
-		line->sy = 1;
-	else
-		line->sy = -1;
-	line->err = line->dx - line->dy;
-}
+	int			x;
+	int			y;
+	t_vector2	offset;
 
-void	plot_point(t_line_data line, int step, int total_steps, t_img_data img)
-{
-	double	percentage;
-	int		color;
-
-	percentage = (double)step / total_steps;
-	color = interpolate_color(line.start_color, line.end_color, percentage);
-	place_pixel_in_img(img, line.start.x, line.start.y, color);
-}
-
-void	bresenheim_line(t_line_data line, t_img_data img_data)
-{
-	int	total_steps;
-	int	step;
-	int	e2;
-
-	init_line_data(&line);
-	total_steps = fmax(line.dx, line.dy);
-	step = 0;
-	while (1)
+	y = 0;
+	while (data.heightmap[y])
 	{
-		plot_point(line, step, total_steps, img_data);
-		if (line.start.x == line.end.x && line.start.y == line.end.y)
-			break ;
-		e2 = line.err * 2;
-		if (e2 > -line.dy)
+		x = 0;
+		while (x < data.x_size)
 		{
-			line.err -= line.dy;
-			line.start.x += line.sx;
+			getset_max_x(projections[y][x].x, 0);
+			getset_min_x(projections[y][x].x, 0);
+			getset_max_y(projections[y][x].y, 0);
+			getset_min_y(projections[y][x].y, 0);
+			x++;
 		}
-		if (e2 < line.dx)
-		{
-			line.err += line.dx;
-			line.start.y += line.sy;
-		}
-		step++;
+		y++;
 	}
+	offset.x = WIDTH / 2 - ((getset_min_x(0, 1) + getset_max_x(0, 1)) / 2);
+	offset.y = HEIGHT / 2 - ((getset_min_y(0, 1) + getset_max_y(0, 1)) / 2);
+	return (offset);
+}
+
+static t_vector2	**translate_projections(t_vector2 **projs, t_data data)
+{
+	int			x;
+	int			y;
+	t_vector2	center_offset;
+
+	center_offset = calc_center_offset(projs, data);
+	y = 0;
+	while (data.heightmap[y])
+	{
+		x = 0;
+		while (x < data.x_size)
+		{
+			projs[y][x] = translate(projs[y][x], center_offset.x + data.tx,
+					center_offset.y + data.ty);
+			x++;
+		}
+		y++;
+	}
+	return (projs);
+}
+
+static void	allocate_and_project_row(t_data data, t_vector2 **projs, int y)
+{
+	int	x;
+
+	projs[y] = malloc(sizeof(t_vector2) * data.x_size);
+	if (!projs[y])
+	{
+		perror("get_projections : row allocation");
+		exit(EXIT_FAILURE);
+	}
+	x = 0;
+	while (x < data.x_size)
+	{
+		projs[y][x] = data.project(x, y, data);
+		x++;
+	}
+}
+
+t_vector2	**get_projections(t_data data)
+{
+	int			i;
+	int			y;
+	t_vector2	**projections;
+
+	i = 0;
+	while (data.heightmap[i])
+		i++;
+	projections = malloc(sizeof(t_vector2 *) * i);
+	if (!projections)
+	{
+		perror("get_projections : allocation");
+		exit(EXIT_FAILURE);
+	}
+	y = 0;
+	while (data.heightmap[y])
+		allocate_and_project_row(data, projections, y++);
+	return (translate_projections(projections, data));
 }

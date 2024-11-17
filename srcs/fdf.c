@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fdf.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/17 18:57:39 by aloubry           #+#    #+#             */
+/*   Updated: 2024/11/17 18:57:56 by aloubry          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fdf.h"
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	t_data data;
-	
-	if(argc != 2)
+	t_data	data;
+
+	if (argc != 2)
 	{
 		ft_putstr_fd("Usage: ", 2);
 		ft_putstr_fd(argv[0], 2);
