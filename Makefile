@@ -24,7 +24,8 @@ $(NAME): $(OBJS) $(LIBFT) $(MLX)
 	$(CC) $(CFLAG) $(OBJS) -o $@ $(LFLAG)
 
 $(MLX):
-	minilibx-linux/configure
+	cd minilibx-linux && ./configure
+	cd ..
 
 $(LIBFT):
 	make -C libft
