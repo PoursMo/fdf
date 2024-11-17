@@ -16,11 +16,15 @@ SRCS =	$(SRCSDIR)fdf.c			\
 		$(SRCSDIR)draw2.c
 OBJS = $(SRCS:.c=.o)
 LIBFT = libft/libft.a
+MLX = minilibx-linux/libmlx_Linux.a
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIBFT)
+$(NAME): $(OBJS) $(LIBFT) $(MLX)
 	$(CC) $(CFLAG) $(OBJS) -o $@ $(LFLAG)
+
+$(MLX):
+	minilibx-linux/configure
 
 $(LIBFT):
 	make -C libft
