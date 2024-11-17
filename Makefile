@@ -9,7 +9,11 @@ SRCS =	$(SRCSDIR)fdf.c			\
 		$(SRCSDIR)image.c		\
 		$(SRCSDIR)color.c		\
 		$(SRCSDIR)input.c		\
-		$(SRCSDIR)projection.c
+		$(SRCSDIR)projection.c	\
+		$(SRCSDIR)setup.c		\
+		$(SRCSDIR)minmax.c		\
+		$(SRCSDIR)draw1.c		\
+		$(SRCSDIR)draw2.c
 OBJS = $(SRCS:.c=.o)
 LIBFT = libft/libft.a
 

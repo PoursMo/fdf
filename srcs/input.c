@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 12:38:01 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/16 14:39:18 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/17 17:44:54 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,9 @@ static void	rotation(int keycode, t_data *data)
 int	handle_key(int keycode, t_data *data)
 {
 	if (keycode == 65307)
-		terminate();
-	else if ((keycode == 61 && data->zoom < 100.0f)
-		|| (keycode == 45 && data->zoom > 1.0f))
+		terminate(*data);
+	else if ((keycode == 61 && data->zoom < 100)
+		|| (keycode == 45 && data->zoom > 1))
 		zoom(keycode, data);
 	else if (keycode == 119 || keycode == 97
 		|| keycode == 115 || keycode == 100)
@@ -66,6 +66,9 @@ int	handle_key(int keycode, t_data *data)
 		rotation(keycode, data);
 	else if (keycode == 112)
 	{
+		data->angle_x = 0;
+		data->angle_y = 0;
+		data->angle_z = 0;
 		data->project = (data->project == perspective_project) ? isometric_project : perspective_project;
 		draw(*data);
 	}
@@ -82,8 +85,8 @@ void	print_tooltips(t_data data)
 		"n/m : rotate z",
 		NULL
 	};
-	int					y;
-	int					i;
+	int			y;
+	int			i;
 
 	y = 15;
 	i = 0;
