@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 13:07:50 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/17 18:04:37 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/18 16:37:39 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ static void	set_initial_values(t_data *data)
 	data->angle_z = 0;
 	data->tx = 0;
 	data->ty = 0;
-	data->project = isometric_project;
+	data->project = &isometric_project;
 }
 
 void	setup(t_data *data, char *file)

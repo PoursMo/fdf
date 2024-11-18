@@ -14,7 +14,8 @@ SRCS =	$(SRCSDIR)fdf.c			\
 		$(SRCSDIR)minmax.c		\
 		$(SRCSDIR)draw1.c		\
 		$(SRCSDIR)draw2.c		\
-		$(SRCSDIR)bresenheim.c	
+		$(SRCSDIR)bresenheim.c	\
+		$(SRCSDIR)angles.c		
 OBJS = $(SRCS:.c=.o)
 LIBFT = libft/libft.a
 MLX = minilibx-linux/libmlx_Linux.a

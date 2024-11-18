@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/17 20:19:44 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/18 16:43:41 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 # include <stdio.h>
 # include <limits.h>
 
-# define WIDTH 800
-# define HEIGHT 600
+# define WIDTH 1920
+# define HEIGHT 1080
 
 typedef struct s_vector2
 {
@@ -45,6 +45,15 @@ typedef struct s_img_data
 	int		endian;
 }	t_img_data;
 
+typedef struct s_proj_data
+{
+	double	rotated_x;
+	double	rotated_y;
+	double	rotated_z;
+	double	final_x;
+	double	final_y;
+}	t_proj_data;
+
 typedef struct s_line_data
 {
 	t_vector2	start;
@@ -58,111 +67,75 @@ typedef struct s_line_data
 	int			err;
 }	t_line_data;
 
-typedef struct s_data
+typedef struct s_data	t_data;
+typedef t_vector2		(*t_project_func)(int x, int y, t_data data);
+struct s_data
 {
-	t_point		**heightmap;
-	t_img_data	img_data;
-	void		*mlx_ptr;
-	void		*mlx_win;
-	int			x_size;
-	int			tx;
-	int			ty;
-	int			zoom;
-	double		angle_x;
-	double		angle_y;
-	double		angle_z;
-	t_vector2	(*project)(int x, int y, struct s_data data);
-}	t_data;
+	t_point			**heightmap;
+	t_img_data		img_data;
+	void			*mlx_ptr;
+	void			*mlx_win;
+	int				x_size;
+	int				tx;
+	int				ty;
+	int				zoom;
+	double			angle_x;
+	double			angle_y;
+	double			angle_z;
+	t_project_func	project;
+};
 
-// //fdf
-// void		draw(t_data data);
+// angles
+double		deg_to_rad(double degrees);
+double		getset_rad_x(t_data *data);
+double		getset_rad_y(t_data *data);
+double		getset_rad_z(t_data *data);
 
-// //minmax
-// int			getset_min_x(int value, char reset);
-// int			getset_max_x(int value, char reset);
-// int			getset_min_y(int value, char reset);
-// int			getset_max_y(int value, char reset);
+// fdf
+void		draw(t_data data);
 
-// //setup
-// void		setup(t_data *data, char *file);
+// minmax
+int			getset_min_x(int value, char reset);
+int			getset_max_x(int value, char reset);
+int			getset_min_y(int value, char reset);
+int			getset_max_y(int value, char reset);
 
-// //input
-// int			handle_key(int keycode, t_data *data);
-// void		print_tooltips(t_data data);
+// setup
+void		setup(t_data *data, char *file);
 
-// //color
-// int			get_color(int red, int green, int blue);
-// int			interpolate_color(int start_color, int end_color, double ratio);
+// input
+int			handle_key(int keycode, t_data *data);
 
-// //projection
-// t_vector2	isometric_project(int x, int y, t_data data);
-// t_vector2	perspective_project(int x, int y, t_data data);
+// color
+int			get_color(int red, int green, int blue);
+int			interpolate_color(int start_color, int end_color, double ratio);
+void		change_colors(t_data *data);
 
-// //image
-// void		create_img(void *mlx, t_img_data *data);
-// void		clear_img(char *data);
+// projection
+t_vector2	isometric_project(int x, int y, t_data data);
+t_vector2	orthographic_project(int x, int y, t_data data);
 
-// //utils
-// int			terminate(t_data data);
-// int			try_open(char *file, int flags);
-// void		try_close(int fd);
-// void		free_map(t_point **map);
-// void		free_split(char **split);
+// image
+void		create_img(void *mlx, t_img_data *data);
+void		clear_img(char *data);
 
-// //draw1
-// void		draw(t_data data);
+// utils
+int			terminate(t_data data);
+int			try_open(char *file, int flags);
+void		try_close(int fd);
+void		free_map(t_point **map);
+void		free_split(char **split);
 
-// //draw2
-// void		bresenheim_line(t_line_data line_data, t_img_data img_data);
+// draw1
+void		draw(t_data data);
 
-// //parse
-// void		parse_map(char *map_file, t_data *data);
-
-// srcs/fdf
-void draw(t_data data);
-
-// srcs/minmax
-int getset_min_x(int value, char reset);
-int getset_max_x(int value, char reset);
-int getset_min_y(int value, char reset);
-int getset_max_y(int value, char reset);
-
-// srcs/setup
-void setup(t_data *data, char *file);
-
-// srcs/input
-int handle_key(int keycode, t_data *data);
-void print_tooltips(t_data data);
-
-// srcs/color
-int get_color(int red, int green, int blue);
-int interpolate_color(int start_color, int end_color, double ratio);
-
-// srcs/projection
-t_vector2 isometric_project(int x, int y, t_data data);
-t_vector2 perspective_project(int x, int y, t_data data);
-
-// srcs/image
-void create_img(void *mlx, t_img_data *data);
-void clear_img(char *data);
-
-// srcs/utils
-int terminate(t_data data);
-int try_open(char *file, int flags);
-void try_close(int fd);
-void free_map(t_point **map);
-void free_split(char **split);
-
-// srcs/draw1
-void draw(t_data data);
-
-// srcs/draw2
+// draw2
 t_vector2	**get_projections(t_data data);
 
-// srcs/bresenheim
-void bresenheim_line(t_line_data line_data, t_img_data img_data);
+// bresenheim
+void		bresenheim_line(t_line_data line_data, t_img_data img_data);
 
-// srcs/parse
-void parse_map(char *map_file, t_data *data);
+// parse
+void		parse_map(char *map_file, t_data *data);
 
 #endif

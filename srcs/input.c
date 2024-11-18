@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 12:38:01 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/17 17:44:54 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/18 16:41:27 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,18 +36,42 @@ static void	translation(int keycode, t_data *data)
 
 static void	rotation(int keycode, t_data *data)
 {
+	double	angle;
+
+	if (data->project == isometric_project)
+		angle = 5.0f;
+	else
+		angle = 90.0f;
 	if (keycode == 110)
-		data->angle_z -= 5.0f;
+		data->angle_z -= angle;
 	else if (keycode == 109)
-		data->angle_z += 5.0f;
+		data->angle_z += angle;
 	else if (keycode == 104)
-		data->angle_y -= 5.0f;
+		data->angle_y -= angle;
 	else if (keycode == 106)
-		data->angle_y += 5.0f;
+		data->angle_y += angle;
 	else if (keycode == 121)
-		data->angle_x -= 5.0f;
+		data->angle_x -= angle;
 	else if (keycode == 117)
-		data->angle_x += 5.0f;
+		data->angle_x += angle;
+	getset_rad_x(data);
+	getset_rad_y(data);
+	getset_rad_z(data);
+	draw(*data);
+}
+
+static void	projection(t_data *data)
+{
+	data->angle_x = 0;
+	data->angle_y = 0;
+	data->angle_z = 0;
+	getset_rad_x(data);
+	getset_rad_y(data);
+	getset_rad_z(data);
+	if (data->project == isometric_project)
+		data->project = orthographic_project;
+	else
+		data->project = isometric_project;
 	draw(*data);
 }
 
@@ -65,36 +89,11 @@ int	handle_key(int keycode, t_data *data)
 		|| keycode == 106 || keycode == 121 || keycode == 117)
 		rotation(keycode, data);
 	else if (keycode == 112)
+		projection(data);
+	else if (keycode == 99)
 	{
-		data->angle_x = 0;
-		data->angle_y = 0;
-		data->angle_z = 0;
-		data->project = (data->project == perspective_project) ? isometric_project : perspective_project;
+		change_colors(data);
 		draw(*data);
 	}
 	return (0);
-}
-
-void	print_tooltips(t_data data)
-{
-	static char	*tooltips[] = {
-		"+/- : zoom",
-		"w/a/s/d : move",
-		"y/u : rotate x",
-		"h/j : rotate y",
-		"n/m : rotate z",
-		NULL
-	};
-	int			y;
-	int			i;
-
-	y = 15;
-	i = 0;
-	while (tooltips[i])
-	{
-		mlx_string_put(data.mlx_ptr, data.mlx_win, 10, y,
-			get_color(100, 255, 100), tooltips[i]);
-		y += 15;
-		i++;
-	}
 }

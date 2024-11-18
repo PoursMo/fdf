@@ -6,11 +6,37 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 13:48:20 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/17 20:16:17 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/18 14:22:46 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+
+static void	print_tooltips(t_data data)
+{
+	static char	*tooltips[] = {
+		"+/- : zoom",
+		"w/a/s/d : move",
+		"y/u : rotate x",
+		"h/j : rotate y",
+		"n/m : rotate z",
+		"p : change projection",
+		"c : shift colors",
+		NULL
+	};
+	int			y;
+	int			i;
+
+	y = 15;
+	i = 0;
+	while (tooltips[i])
+	{
+		mlx_string_put(data.mlx_ptr, data.mlx_win, 10, y,
+			get_color(100, 255, 100), tooltips[i]);
+		y += 15;
+		i++;
+	}
+}
 
 static t_line_data	pld(t_vector2 start, t_vector2 end, int st_col, int end_col)
 {
