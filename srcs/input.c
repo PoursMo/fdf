@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 12:38:01 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/18 16:41:27 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/18 18:07:38 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ static void	projection(t_data *data)
 int	handle_key(int keycode, t_data *data)
 {
 	if (keycode == 65307)
-		terminate(*data);
+		terminate();
 	else if ((keycode == 61 && data->zoom < 100)
 		|| (keycode == 45 && data->zoom > 1))
 		zoom(keycode, data);

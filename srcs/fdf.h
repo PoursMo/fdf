@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 10:53:27 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/18 16:43:41 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/18 18:07:17 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ void		create_img(void *mlx, t_img_data *data);
 void		clear_img(char *data);
 
 // utils
-int			terminate(t_data data);
+int			terminate(void);
 int			try_open(char *file, int flags);
 void		try_close(int fd);
 void		free_map(t_point **map);

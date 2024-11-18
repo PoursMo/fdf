@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 13:07:50 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/18 16:37:39 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/18 18:28:04 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ static int	get_zoom(void)
 	int	zoom_x;
 	int	zoom_y;
 
-	zoom_x = WIDTH / (getset_max_x(0, 1) - getset_min_x(0, 1));
-	zoom_y = HEIGHT / (getset_max_y(0, 1) - getset_min_y(0, 1));
+	zoom_x = WIDTH / fmax((getset_max_x(0, 1) - getset_min_x(0, 1)), 1);
+	zoom_y = HEIGHT / fmax((getset_max_y(0, 1) - getset_min_y(0, 1)), 1);
 	if (zoom_x < zoom_y)
 	{
 		if (zoom_x < 1)

@@ -6,7 +6,7 @@
 /*   By: aloubry <aloubry@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 15:08:20 by aloubry           #+#    #+#             */
-/*   Updated: 2024/11/18 16:45:50 by aloubry          ###   ########.fr       */
+/*   Updated: 2024/11/18 18:06:59 by aloubry          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	try_open(char *file, int flags)
 	fd = open(file, flags);
 	if (fd == -1)
 	{
-		perror("open");
+		perror(file);
 		exit(EXIT_FAILURE);
 	}
 	return (fd);
@@ -60,8 +60,7 @@ void	free_split(char **split)
 	free(split);
 }
 
-int	terminate(t_data data)
+int	terminate(void)
 {
-	free_map(data.heightmap);
 	exit(0);
 }
